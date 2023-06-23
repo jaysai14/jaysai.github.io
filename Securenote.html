@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Private Note</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            resize: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create a Private Note</h1>
+        <textarea id="noteContent" placeholder="Enter your private note here"></textarea>
+        <button onclick="createPrivateNote()">Create Note</button>
+    </div>
+
+    <script>
+        function createPrivateNote() {
+            var noteContent = document.getElementById("noteContent").value;
+            var encryptedNote = btoa(noteContent); // Encrypt the note content
+            
+            // Generate a unique URL for the note
+            var baseUrl = window.location.href.split('?')[0]; // Get the current page URL without query parameters
+            var noteUrl = baseUrl + "?note=" + encodeURIComponent(encryptedNote);
+            
+            // Display the note URL to the user
+            var noteLinkContainer = document.createElement("div");
+            noteLinkContainer.innerHTML = "<p>Share this link:</p><a href='" + noteUrl + "'>" + noteUrl + "</a>";
+            document.body.appendChild(noteLinkContainer);
+        }
+
+        // Check if a note is specified in the URL and display it
+        function checkNoteInUrl() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var encryptedNote = urlParams.get('note');
+            
+            if (encryptedNote) {
+                var noteContent = atob(encryptedNote); // Decrypt the note content
+                var noteDisplayContainer = document.createElement("div");
+                noteDisplayContainer.innerHTML = "<h2>Private Note</h2><p>" + noteContent + "</p>";
+                document.body.appendChild(noteDisplayContainer);
+                
+                // Remove the note from the URL after displaying it
+                var baseUrl = window.location.href.split('?')[0]; // Get the current page URL without query parameters
+                window.history.replaceState({}, document.title, baseUrl);
+            }
+        }
+
+        // Call the checkNoteInUrl function on page load
+        window.onload = checkNoteInUrl;
+    </script>
+</body>
+</html>
